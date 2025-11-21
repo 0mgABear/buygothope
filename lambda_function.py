@@ -1,5 +1,14 @@
-from playwright.sync_api import sync_playwright
+import os
+import shutil
+import subprocess
 import re
+from playwright.sync_api import sync_playwright
+
+def ensure_chromium_cached():
+    if os.path.exists(CHROMIUM_DST):
+        return
+    shutil.copytree(CHROMIUM_SRC, CHROMIUM_DST)
+    os.chmod(CHROME_PATH, 0o755)
 
 def scrape_next_draw():
     with sync_playwright() as p:
