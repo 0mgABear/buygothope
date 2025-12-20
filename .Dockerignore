@@ -1,0 +1,8 @@
+cron_toto/
+package/
+*.pyc
+__pycache__/
+.DS_Store
+.git/
+.env
+node_modules/
