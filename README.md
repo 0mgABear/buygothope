@@ -1,4 +1,6 @@
-Project: Got Buy Got Hope (Loosely Translated from 有买有希望)
+# Project: Got Buy Got Hope
+
+## (Loosely Translated from 有买有希望)
 
 Idea:
 Telegram Bot that can either be subscribed to or added to groups to check the next jackpot and draw amount.
@@ -65,3 +67,9 @@ Solution: Increase timeout and Memory. Successful.
 Completion Date: 22 Dec 2025
 
 The bot will have a daily reminder at 12PM about when is the next TOTO Jackpot.
+
+## Updates
+
+1. Quality of Life Update
+   Date Check. Bot runs everyday, will perform a check if the next draw date is the date of execution.
+   If so, bot will ping that the draw is "Tonight, XX timing" rather than the generic Next Draw: XX Day, XX Timing.
