@@ -1,6 +1,6 @@
 import os
 import requests
-from playwright.sync_api import sync_playwright, TimeoutError as PWTimeoutError
+from playwright.sync_api import sync_playwright
 from dotenv import load_dotenv
 from datetime import date
 
