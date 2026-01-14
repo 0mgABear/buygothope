@@ -115,3 +115,8 @@ This also avoids unnecessary full page text processing.
 3. Introduction of Witty Comment
 
 Using Gemini API (as there is a small free tier), we can generate a comment to "encourage" people to buy the TOTO Jackpot.
+
+4. Introduction of Mode 2: Results Mode
+
+This was a requested feature, which is also a key quality-of-life update. At date of running, if there is a result, the bot will also check for results.
+It will return the winning numbers, additional number, number of winner(s) and details of the winning ticket(s).
