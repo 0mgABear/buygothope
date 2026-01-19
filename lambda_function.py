@@ -116,6 +116,18 @@ def lambda_handler(event, context):
             g1_share_amt = g1_cells[1]
             g1_winners = g1_cells[2]
             g1_winners_int = int("".join(c for c in g1_winners if c.isdigit()) or "0")
+
+            if g1_winners_int == 0:
+                browser.close()
+                send_telegram(
+                f"🏆 TOTO Results ({draw_date})\n"
+                f"{draw_no}\n"
+                f"Winning Numbers: {' · '.join(winning_nums)}\n"
+                f"Additional Number: {additional_num}\n\n"
+                f"No winners today!"
+            )
+                return {"statusCode": 200}
+
  
             group1_outlets = []
             if g1_winners_int >= 1:
@@ -148,7 +160,7 @@ def lambda_handler(event, context):
         msg = (
             f"🏆 TOTO Results ({draw_date})\n"
             f"{draw_no}\n"
-            f"Winning Numbers: {' '.join(winning_nums)}\n"
+            f"Winning Numbers: {' · '.join(winning_nums)}\n"
             f"Additional Number: {additional_num}\n"
             f"Group 1: {g1_share_amt} each ({g1_winners} winner(s))"
         )
