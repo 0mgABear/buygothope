@@ -2,3 +2,4 @@ playwright
 python-dotenv
 websockets
 requests
+boto3

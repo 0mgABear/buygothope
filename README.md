@@ -136,3 +136,6 @@ Further local testing revealed that it was working, re-testing by invoking direc
 Preliminary conclusions: one-off errror.
 
 Fix taken (retry mechanism) to improve the robustness against such errors.
+
+7. Improvement of Scheduling for better and more reliable results generation.
+   Creation of one-off EventBridge schedule via code instead of a daily 10:30PM Cron EventBridge Schedule.

@@ -2,10 +2,37 @@ import os
 import requests
 from playwright.sync_api import sync_playwright
 from dotenv import load_dotenv
-from datetime import date
+from datetime import date, datetime
 import time, random
+import boto3, json
+
 
 load_dotenv()
+
+def schedule_results_eventbridge(run_at_sg):
+    scheduler = boto3.client("scheduler")
+
+    name = f"toto-results-{run_at_sg.strftime('%Y%m%d-%H%M')}"
+
+    try:
+        scheduler.get_schedule(Name=name)
+        return
+    except scheduler.exceptions.ResourceNotFoundException:
+        pass
+
+    scheduler.create_schedule(
+        Name=name,
+        ScheduleExpression=f"at({run_at_sg.strftime('%Y-%m-%dT%H:%M:%S')})",
+        ScheduleExpressionTimezone="Asia/Singapore",
+        FlexibleTimeWindow={"Mode": "OFF"},
+        ActionAfterCompletion="DELETE",
+        Target={
+            "Arn": os.environ["RESULTS_LAMBDA_ARN"],
+            "RoleArn": os.environ["SCHEDULER_ROLE_ARN"],
+            "Input": json.dumps({"mode": "results"})
+        }
+    )
+
 
 def generate_comment(jackpot_value):
     if jackpot_value < 3000000:
@@ -40,17 +67,12 @@ def generate_comment(jackpot_value):
 
             if r.status_code in (429, 500, 502, 503, 504):
                 sleep = (2 ** i) + random.random()
-                print(f"[gemini] HTTP {r.status_code}, retry {i+1}/5 in {sleep:.2f}s")
-                print(f"[gemini] body={r.text[:500]}")
                 time.sleep(sleep)
                 continue
 
             break
 
         if not r.ok:
-            print(f"[gemini] HTTP {r.status_code}")
-            print(f"[gemini] headers={dict(r.headers)}")
-            print(f"[gemini] body={r.text[:2000]}")
             return ""
 
         data = r.json()
@@ -73,7 +95,6 @@ def generate_comment(jackpot_value):
 def send_telegram(text):
     token = os.environ["TELEGRAM_BOT_TOKEN"]
     chat_id = os.environ["TELEGRAM_CHAT_ID"]
-    url = f"https://api.telegram.org/bot{token}/sendMessage"
     r = requests.post(url, json={"chat_id": chat_id, "text": text})
     r.raise_for_status()
 
@@ -102,6 +123,14 @@ def lambda_handler(event, context):
 
         parts = next_draw_date.split(",")
         date_part , time_part = parts[1].strip(), parts[2].strip()
+        draw_date = datetime.strptime(date_part, "%d %b %Y").date()
+
+        if time_part == "6.30pm":
+            run_at_sg = datetime.combine(draw_date, datetime.strptime("19:00", "%H:%M").time())
+            schedule_results_eventbridge(run_at_sg)
+        elif time_part == "9.30pm":
+            run_at_sg = datetime.combine(draw_date, datetime.strptime("23:05", "%H:%M").time())
+            schedule_results_eventbridge(run_at_sg)
 
         if date_part ==  date.today().strftime('%d %b %Y'):
             msg = f"🎰 TOTO Update\nNext Jackpot: {jackpot}\nNext Draw: Tonight, {time_part}"
